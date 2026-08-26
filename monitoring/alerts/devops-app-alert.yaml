@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: devops-app-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: devops-app.rules
+      rules:
+
+        - alert: DevOpsAppPodDown
+          expr: |
+            kube_pod_status_phase{
+              namespace="devops-app",
+              phase="Running"
+            } < 4
+          for: 5m
+
+          labels:
+            severity: warning
+            application: devops-app
+
+          annotations:
+            summary: "DevOps application pod is down"
+            description: "The number of running pods in devops-app is below 4."
